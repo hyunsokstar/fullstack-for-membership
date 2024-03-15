@@ -1,10 +1,32 @@
 import { Box, Flex, Link, Button, Divider } from "@chakra-ui/react";
 import LoginModalButton from "./LoginModalButton";
 import SignUpModalButton from "./SignUpModalButton";
-import { useAuthStore } from "@/store/AuthStore";
+import useAuthStore from "@/store/AuthStore";
+import { useEffect } from "react";
+import { apiForLoginCheck } from "../apis/apiForAuth";
 
 const HeaderNavigation = () => {
-    const { user } = useAuthStore();
+    const { loginUser, login } = useAuthStore();
+
+    useEffect(() => {
+        const checkLogin = async () => {
+            try {
+                const response = await apiForLoginCheck();
+                console.log("response for logincheck : ", response);
+
+                if (response.loginUser) {
+                    login(response.loginUser);
+                }
+            } catch (error) {
+                console.error("Login check error:", error);
+            }
+        };
+
+        if (!loginUser) {
+            checkLogin();
+        }
+
+    }, [loginUser, login]);
 
     return (
         <Flex
@@ -29,9 +51,9 @@ const HeaderNavigation = () => {
             </Flex>
 
             <Box mt={2}>
-                {user ? (
+                {loginUser ? (
                     <Box display={"flex"}>
-                        <Box mr={2}>안녕하세요 {user.email}님</Box>
+                        <Box mr={2}>안녕하세요 {loginUser.email}님</Box>
                         <Button colorScheme="blue" onClick={() => useAuthStore.getState().logout()}>
                             로그아웃
                         </Button>

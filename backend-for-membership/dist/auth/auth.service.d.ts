@@ -7,8 +7,11 @@ export declare class AuthService {
     private usersRepository;
     private jwtService;
     constructor(usersRepository: Repository<UsersModel>, jwtService: JwtService);
+    findUserByEmail(email: string): Promise<boolean>;
     signUp(userData: SignUpUserDto): Promise<UsersModel>;
     signIn(userData: SignInUserDto): Promise<{
+        success: boolean;
         accessToken: string;
+        loginUser: UsersModel;
     }>;
 }

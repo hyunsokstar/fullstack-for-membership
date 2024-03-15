@@ -4,13 +4,13 @@ export class SignUpUserDto {
     @IsEmail()
     email: string;
 
-    @IsString()
-    @IsOptional()
-    name: string;
+    // @IsString()
+    // @IsOptional()
+    // name: string;
 
-    @IsString()
-    @IsOptional()
-    phoneNumber: string;
+    // @IsString()
+    // @IsOptional()
+    // phoneNumber: string;
 
     @IsString()
     @MinLength(8)

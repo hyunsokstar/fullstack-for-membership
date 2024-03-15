@@ -19,6 +19,7 @@ import {
 } from '@chakra-ui/react'
 import { yupResolver } from '@hookform/resolvers/yup';
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import useApiForSignUp from '@/hooks/useApiForSignUp';
 
 type SignUpFormData = {
     email: string
@@ -38,6 +39,8 @@ const signUpSchema = yup.object().shape({
 const SignUpModalButton: React.FC = () => {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [showPassword, setShowPassword] = useState(false);
+    const signUpMutation = useApiForSignUp();
+
 
     const {
         register,
@@ -49,6 +52,10 @@ const SignUpModalButton: React.FC = () => {
 
     const onSubmit = (data: SignUpFormData) => {
         console.log(data)
+        signUpMutation.mutate({
+            email: data.email,
+            password: data.password
+        })
     }
 
     return (

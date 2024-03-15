@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Req, Get } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req, Get, HttpCode, HttpStatus, HttpException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpUserDto } from './dto/signup-user.dto';
 import { UsersModel } from 'src/users/entities/user.entity';
@@ -11,14 +11,32 @@ export class AuthController {
     constructor(private authService: AuthService) { }
 
     @Post('signup')
-    async signUp(@Body() userData: SignUpUserDto): Promise<UsersModel> {
-        return this.authService.signUp(userData);
+    @HttpCode(HttpStatus.CREATED)
+    async signUp(@Body() userData: SignUpUserDto): Promise<{ success: boolean; message: string; user: UsersModel }> {
+        const isUserExist = await this.authService.findUserByEmail(userData.email);
+
+        if (isUserExist) {
+            throw new HttpException({ success: false, message: 'user is already exists', user: null }, HttpStatus.CONFLICT);
+        }
+
+        const user = await this.authService.signUp(userData);
+
+        return { success: true, message: 'Sign Up success', user };
+
     }
 
     @Post('signin')
-    async signIn(@Body() userData: SignInUserDto): Promise<{ accessToken: string }> {
-        return this.authService.signIn(userData);
+    @HttpCode(HttpStatus.OK)
+    async signIn(@Body() userData: SignInUserDto): Promise<{ success: boolean, accessToken: string, loginUser: UsersModel }> {
+        const result = await this.authService.signIn(userData);
+
+        return {
+            success: result.success,
+            accessToken: result.accessToken,
+            loginUser: result.loginUser
+        };
     }
+
 
     @UseGuards(AuthGuard())
     @Get('loginCheck')
@@ -27,7 +45,7 @@ export class AuthController {
         if (user) {
             return {
                 success: true,
-                user: user,
+                loginUser: user,
             };
         } else {
             return {

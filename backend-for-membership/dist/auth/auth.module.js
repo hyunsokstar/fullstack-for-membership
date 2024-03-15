@@ -12,9 +12,9 @@ const auth_controller_1 = require("./auth.controller");
 const auth_service_1 = require("./auth.service");
 const typeorm_1 = require("@nestjs/typeorm");
 const user_entity_1 = require("../users/entities/user.entity");
-const jwt_1 = require("@nestjs/jwt");
 const auth_middleware_1 = require("./middlewares/auth.middleware");
 const jwt_strategy_1 = require("./jwt.strategy");
+const jwt_1 = require("@nestjs/jwt");
 const passport_1 = require("@nestjs/passport");
 let AuthModule = class AuthModule {
     configure(consumer) {

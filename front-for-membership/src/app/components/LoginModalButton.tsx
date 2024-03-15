@@ -1,7 +1,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { Modal, ModalBody, ModalFooter, ModalHeader, ModalOverlay, ModalContent, ModalCloseButton, Button, Input, FormLabel, FormControl, useDisclosure, Box } from "@chakra-ui/react";
-import { useAuthStore } from "@/store/AuthStore";
+import useApiForLogin from "@/hooks/useApiForLogin";
 
 type FormData = {
     email: string;
@@ -11,10 +11,10 @@ type FormData = {
 const LoginModalButton: React.FC = () => {
     const { register, handleSubmit } = useForm<FormData>();
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const { login } = useAuthStore();
+    const mutationForLogin = useApiForLogin();
 
-    const onSubmit = (data: FormData) => {
-        login(data.email, data.password);
+    const onSubmit = async (data: FormData) => {
+        await mutationForLogin.mutateAsync(data);
         onClose();
     };
 

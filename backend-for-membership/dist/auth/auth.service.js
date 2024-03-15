@@ -24,12 +24,14 @@ let AuthService = class AuthService {
         this.usersRepository = usersRepository;
         this.jwtService = jwtService;
     }
+    async findUserByEmail(email) {
+        const isUserExist = await this.usersRepository.findOne({ where: { email: email } });
+        return !!isUserExist;
+    }
     async signUp(userData) {
-        const { email, name, phoneNumber, password } = userData;
+        const { email, password } = userData;
         const user = new user_entity_1.UsersModel();
         user.email = email;
-        user.name = name;
-        user.phoneNumber = phoneNumber;
         user.password = await bcrypt.hash(password, 10);
         await this.usersRepository.save(user);
         user.password = undefined;
@@ -41,7 +43,7 @@ let AuthService = class AuthService {
         if (user && await bcrypt.compare(password, user.password)) {
             const payload = { email };
             const accessToken = this.jwtService.sign(payload);
-            return { accessToken };
+            return { success: true, accessToken, loginUser: user };
         }
         else {
             throw new common_1.UnauthorizedException();

@@ -15,29 +15,35 @@ export class AuthService {
         private jwtService: JwtService,  // JwtService 주입
     ) { }
 
+    async findUserByEmail(email: string): Promise<boolean> {
+        const isUserExist = await this.usersRepository.findOne({ where: { email: email } });
+        return !!isUserExist;
+    }
+
     async signUp(userData: SignUpUserDto): Promise<UsersModel> {
-        const { email, name, phoneNumber, password } = userData;
+        const { email, password } = userData;
         const user = new UsersModel();
         user.email = email;
-        user.name = name;
-        user.phoneNumber = phoneNumber;
         user.password = await bcrypt.hash(password, 10);
+
         await this.usersRepository.save(user);
+
         user.password = undefined;
         return user;
     }
 
-    async signIn(userData: SignInUserDto): Promise<{ accessToken: string }> {
+    async signIn(userData: SignInUserDto): Promise<{ success: boolean, accessToken: string, loginUser: UsersModel }> {
         const { email, password } = userData;
         const user = await this.usersRepository.findOne({ where: { email } });
 
         if (user && await bcrypt.compare(password, user.password)) {
             const payload = { email };
             const accessToken = this.jwtService.sign(payload);
-            return { accessToken };
+            return { success: true, accessToken, loginUser: user };
         } else {
             throw new UnauthorizedException();
         }
     }
+
 
 }

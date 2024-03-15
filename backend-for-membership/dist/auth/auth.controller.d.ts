@@ -6,9 +6,15 @@ import { RequestWithUser } from './interfaces/request-with-user.interface';
 export declare class AuthController {
     private authService;
     constructor(authService: AuthService);
-    signUp(userData: SignUpUserDto): Promise<UsersModel>;
+    signUp(userData: SignUpUserDto): Promise<{
+        success: boolean;
+        message: string;
+        user: UsersModel;
+    }>;
     signIn(userData: SignInUserDto): Promise<{
+        success: boolean;
         accessToken: string;
+        loginUser: UsersModel;
     }>;
     loginCheck(req: RequestWithUser): any;
 }

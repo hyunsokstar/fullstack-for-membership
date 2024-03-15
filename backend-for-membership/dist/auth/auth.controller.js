@@ -23,17 +23,27 @@ let AuthController = class AuthController {
         this.authService = authService;
     }
     async signUp(userData) {
-        return this.authService.signUp(userData);
+        const isUserExist = await this.authService.findUserByEmail(userData.email);
+        if (isUserExist) {
+            throw new common_1.HttpException({ success: false, message: 'user is already exists', user: null }, common_1.HttpStatus.CONFLICT);
+        }
+        const user = await this.authService.signUp(userData);
+        return { success: true, message: 'Sign Up success', user };
     }
     async signIn(userData) {
-        return this.authService.signIn(userData);
+        const result = await this.authService.signIn(userData);
+        return {
+            success: result.success,
+            accessToken: result.accessToken,
+            loginUser: result.loginUser
+        };
     }
     loginCheck(req) {
         const user = req.user;
         if (user) {
             return {
                 success: true,
-                user: user,
+                loginUser: user,
             };
         }
         else {
@@ -47,6 +57,7 @@ let AuthController = class AuthController {
 exports.AuthController = AuthController;
 __decorate([
     (0, common_1.Post)('signup'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [signup_user_dto_1.SignUpUserDto]),
@@ -54,6 +65,7 @@ __decorate([
 ], AuthController.prototype, "signUp", null);
 __decorate([
     (0, common_1.Post)('signin'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [signin_user_dto_1.SignInUserDto]),
